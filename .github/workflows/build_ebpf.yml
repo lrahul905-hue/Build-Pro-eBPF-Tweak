@@ -1,0 +1,29 @@
+name: Build Pro eBPF Tweak
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-ebpf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install LLVM and Clang
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm libelf-dev libpcap-dev build-essential linux-tools-generic libbpf-dev
+
+      - name: Compile eBPF Bytecode
+        run: |
+          clang -g -O2 -target bpf -c bpf_tweak.c -o bpf_tweak.o
+
+      - name: Upload Brahmastra eBPF Object
+        uses: actions/upload-artifact@v4
+        with:
+          name: Brahmastra-eBPF-Bytecode
+          path: bpf_tweak.o
+          
